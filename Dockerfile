@@ -5,6 +5,7 @@ RUN set -x \
     && update-ca-certificates
 
 RUN wget -O fallen.zip https://files.phpmyadmin.net/themes/fallen/0.7/fallen-0.7.zip && \
+		mkdir -p /www/themes && \
 		rm -rf /www/themes/fallen* && \
 		unzip -d/www/themes fallen.zip
 
