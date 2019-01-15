@@ -1,13 +1,13 @@
-FROM phpmyadmin/phpmyadmin
+FROM phpmyadmin/phpmyadmin:latest
 
-RUN set -x \
-    && apk add --no-cache ca-certificates wget \
-    && update-ca-certificates
-
-RUN wget -O fallen.zip https://files.phpmyadmin.net/themes/fallen/0.7/fallen-0.7.zip && \
-		rm -rf /var/www/html/themes/fallen* && \
-		unzip -d/var/www/html/themes fallen.zip
+# Env vars (theme downloaded in run.sh)
+ENV CUSTOM_THEME=fallen
+ENV CUSTOM_THEME_VERSION=0.7
 
 # Get fully-configured file
 COPY config.inc.php /etc/phpmyadmin/config.user.inc.php
 RUN chmod 775 /etc/phpmyadmin/config.user.inc.php
+
+# Copy main script
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
