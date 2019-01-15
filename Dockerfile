@@ -5,9 +5,8 @@ RUN set -x \
     && update-ca-certificates
 
 RUN wget -O fallen.zip https://files.phpmyadmin.net/themes/fallen/0.7/fallen-0.7.zip && \
-		mkdir -p /www/themes && \
-		rm -rf /www/themes/fallen* && \
-		unzip -d/www/themes fallen.zip
+		rm -rf /var/www/html/themes/fallen* && \
+		unzip -d/var/www/html/themes fallen.zip
 
 # Get fully-configured file
 COPY config.inc.php /etc/phpmyadmin/config.user.inc.php
