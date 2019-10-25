@@ -1,0 +1,21 @@
+{{ range $host, $containers := groupByMulti $ "Env.PHPMYADMIN_SERVER" "," }}
+
+{{ range $index, $value := $containers }}
+
+	{{ $addrLen := len $value.Addresses }}
+	{{ $network := index $value.Networks 0 }}
+	{{ $address := index $value.Addresses 0 }}
+
+	$i++;
+	$cfg['Servers'][$i]['verbose'] = '{{ $value.Env.PHPMYADMIN_SERVER }}';
+	$cfg['Servers'][$i]['host'] = '{{ $address.IP }}';
+	$cfg['Servers'][$i]['port'] = '';
+	$cfg['Servers'][$i]['socket'] = '';
+	$cfg['Servers'][$i]['connect_type'] = 'tcp';
+	$cfg['Servers'][$i]['extension'] = 'mysqli';
+	$cfg['Servers'][$i]['auth_type'] = 'cookie';
+	$cfg['Servers'][$i]['AllowNoPassword'] = false;
+	
+{{ end }}
+
+{{ end }}

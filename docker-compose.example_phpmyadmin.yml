@@ -1,0 +1,28 @@
+version: '3'
+volumes:
+  pmaconf:
+  pmathemes:
+networks:
+  phpmyadmin:
+    external: true
+services:
+  phpmyadmin:
+    image: rkcreation/phpmyadmin:3
+    restart: always
+    ports:
+      - 8500:80
+  gen:
+    image: jwilder/docker-gen
+    environment:
+      - PHPMYADMIN_SERVER=mysql_server2
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - pmaconf:/etc/phpmyadmin
+      - pmathemes:/www/themes
+      - ./phpmyadmin-servers.tmpl:/etc/docker-gen/templates/phpmyadmin-servers.tmpl
+    command: -notify-sighup phpmyadmin -watch /etc/docker-gen/templates/phpmyadmin-servers.tmpl /etc/phpmyadmin/config.servers.inc.php
+    volumes:
+      - ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl
+    networks:
+      phpmyadmin:
+      default:

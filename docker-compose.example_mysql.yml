@@ -1,0 +1,21 @@
+version: '3'
+networks:
+  phpmyadmin:
+    external: true
+services:
+  mysql:
+    image: mysql:5
+    restart: always
+    environment:
+      - PHPMYADMIN_SERVER=mysql_server1
+    networks:
+      phpmyadmin:
+      default:
+  mysql2:
+    image: mysql:5
+    restart: always
+    environment:
+      - PHPMYADMIN_SERVER=mysql_server2
+    networks:
+      phpmyadmin:
+      default:

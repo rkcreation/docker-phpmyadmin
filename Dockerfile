@@ -1,8 +1,8 @@
-FROM phpmyadmin/phpmyadmin:latest
+FROM phpmyadmin/phpmyadmin:4.9
 
 # Env vars (theme downloaded in run.sh)
 ENV CUSTOM_THEME=fallen
-ENV CUSTOM_THEME_VERSION=0.7
+ENV CUSTOM_THEME_VERSION=0.7.1
 
 # Get fully-configured file
 COPY config.inc.php /etc/phpmyadmin/config.user.inc.php
