@@ -8,6 +8,7 @@ services:
     restart: always
     environment:
       - PHPMYADMIN_SERVER=mysql_server1
+      - MYSQL_ROOT_PASSWORD=root
     networks:
       phpmyadmin:
       default:
@@ -16,6 +17,16 @@ services:
     restart: always
     environment:
       - PHPMYADMIN_SERVER=mysql_server2
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      phpmyadmin:
+      default:
+  mysql3:
+    image: mysql:5
+    restart: always
+    environment:
+      - PHPMYADMIN_SERVER=Mysql Server 3
+      - MYSQL_ROOT_PASSWORD=root
     networks:
       phpmyadmin:
       default:

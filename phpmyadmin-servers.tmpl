@@ -1,21 +1,53 @@
+<?php
+
+/* Uploads setup */
+$cfg['UploadDir'] = isset($_ENV['UPLOAD_PATH']) ? $_ENV['UPLOAD_PATH'] : '/backups';
+$cfg['SaveDir'] = '';
+
+/* Theme Metro */
+$cfg['ThemeManager'] = false;
+$cfg['ThemeDefault'] = isset($_ENV['CUSTOM_THEME']) ? $_ENV['CUSTOM_THEME'] : 'fallen';
+
+/* Login validity */
+$cfg['LoginCookieValidity'] = isset($_ENV['LOGIN_EXPIRATION']) ? $_ENV['LOGIN_EXPIRATION'] : 24 * 3600;
+
+/* Export default config */
+$cfg['Export']['method'] = 'custom';
+$cfg['Export']['compression'] = 'gzip';
+$cfg['Export']['file_template_table'] = ( isset($_ENV['STACK_NAME']) ? str_replace('.','-',$_ENV['STACK_NAME']) : 'dev' ) . ( isset($_ENV['APPLICATION_ENV']) ? '-'.$_ENV['APPLICATION_ENV'] : '' ) . '--@DATABASE@--@TABLE@--%F--%H-%M-%S';
+$cfg['Export']['file_template_database'] = ( isset($_ENV['STACK_NAME']) ? str_replace('.','-',$_ENV['STACK_NAME']) : 'dev' ) . ( isset($_ENV['APPLICATION_ENV']) ? '-'.$_ENV['APPLICATION_ENV'] : '' ) . '--@DATABASE@--%F--%H-%M-%S';
+$cfg['Export']['file_template_server'] = ( isset($_ENV['STACK_NAME']) ? str_replace('.','-',$_ENV['STACK_NAME']) : 'dev' ) . ( isset($_ENV['APPLICATION_ENV']) ? '-'.$_ENV['APPLICATION_ENV'] : '' ) . '--server--@SERVER@--%F--%H-%M-%S';
+$cfg['Export']['sql_drop_table'] = true;
+
 {{ range $host, $containers := groupByMulti $ "Env.PHPMYADMIN_SERVER" "," }}
 
-{{ range $index, $value := $containers }}
+	{{ $containersLen := len $containers }}
+	{{ range $index, $value := $containers }}
 
-	{{ $addrLen := len $value.Addresses }}
-	{{ $network := index $value.Networks 0 }}
-	{{ $address := index $value.Addresses 0 }}
+		{{ $network := index $value.Networks 0 }}
 
-	$i++;
-	$cfg['Servers'][$i]['verbose'] = '{{ $value.Env.PHPMYADMIN_SERVER }}';
-	$cfg['Servers'][$i]['host'] = '{{ $address.IP }}';
-	$cfg['Servers'][$i]['port'] = '';
-	$cfg['Servers'][$i]['socket'] = '';
-	$cfg['Servers'][$i]['connect_type'] = 'tcp';
-	$cfg['Servers'][$i]['extension'] = 'mysqli';
-	$cfg['Servers'][$i]['auth_type'] = 'cookie';
-	$cfg['Servers'][$i]['AllowNoPassword'] = false;
-	
+		// {{$value.Name}}
+		$i++;
+		{{ if eq $containersLen 1 }}
+			$cfg['Servers'][$i]['verbose'] = '{{ $value.Env.PHPMYADMIN_SERVER }}';
+		{{ else }}
+			$cfg['Servers'][$i]['verbose'] = '{{ $value.Env.PHPMYADMIN_SERVER }}-{{ $index }}';
+		{{ end }}
+
+		$cfg['Servers'][$i]['host'] = '{{ $network.IP }}';
+		$cfg['Servers'][$i]['port'] = '';
+
+		$cfg['Servers'][$i]['socket'] = '';
+		$cfg['Servers'][$i]['connect_type'] = 'tcp';
+		$cfg['Servers'][$i]['extension'] = 'mysqli';
+		$cfg['Servers'][$i]['auth_type'] = 'cookie';
+		$cfg['Servers'][$i]['AllowNoPassword'] = false;
+		$cfg['Servers'][$i]['hide_db'] = '(information_schema|performance_schema|test)';
+		
+	{{ end }}
+
 {{ end }}
 
-{{ end }}
+print '<pre>';
+var_dump($cfg);
+print '</pre>';

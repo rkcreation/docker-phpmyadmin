@@ -16,6 +16,8 @@
 - Exports : pre-configured exports with STACK_NAME-APPLICATION_ENV--DB--TIME.sql.gz
 
 ## Multi-server ##
+Supports `config.servers.inc.php`.
+
 Build a `config.servers.inc.php` file, with content :
 
 ```php
@@ -36,54 +38,10 @@ See `phpmyadmin-servers.tmpl`.
 Use `PHPMYADMIN_SERVER` on mysql containers.
 
 In a `docker-compose.yml` file :
-```yaml
-version: '3'
-volumes:
-    pmaconf:
-networks:
-    phpmyadmin:
-        external: true
-services:
-    phpmyadmin:
-        image: rkcreation/phpmyadmin:3
-        restart: always
-    gen:
-        image: jwilder/docker-gen
-        environment:
-            - PHPMYADMIN_SERVER=mysql_server2
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
-            - pmaconf:/etc/phpmyadmin
-            - ./phpmyadmin-servers.tmpl:/etc/docker-gen/templates/phpmyadmin-servers.tmpl
-        command: -notify-sighup phpmyadmin -watch /etc/docker-gen/templates/phpmyadmin-servers.tmpl /etc/phpmyadmin/config.servers.inc.php
-        volumes:
-            - ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl
-        networks:
-            phpmyadmin:
-            default:
-```
-
-In an other `docker-compose.yml` file :
-```yaml
-version: '3'
-networks:
-    phpmyadmin:
-        external: true
-services:
-    mysql:
-        image: mysql:5
-        restart: always
-        environment:
-            - PHPMYADMIN_SERVER=mysql_server1
-        networks:
-            phpmyadmin:
-            default:
-    mysql2:
-        image: mysql:5
-        restart: always
-        environment:
-            - PHPMYADMIN_SERVER=mysql_server2
-        networks:
-            phpmyadmin:
-            default:
+```bash
+# Start PHPMyAdmin service with docker-gen
+docker network create phpmyadmin
+docker-compose -f docker-compose.example_phpmyadmin.yml up -d
+# Start mysql containers
+docker-compose -f docker-compose.example_mysql.yml up -d
 ```

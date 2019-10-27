@@ -7,7 +7,7 @@ $cfg['SaveDir'] = '';
 
 /* Theme Metro */
 $cfg['ThemeManager'] = false;
-$cfg['ThemeDefault'] = isset($_ENV['CUSTOM_THEME']) ? $_ENV['CUSTOM_THEME'] : 'fallen';
+$cfg['ThemeDefault'] = 'pmahomme';//isset($_ENV['CUSTOM_THEME']) ? $_ENV['CUSTOM_THEME'] : 'fallen';
 
 /* Login validity */
 $cfg['LoginCookieValidity'] = isset($_ENV['LOGIN_EXPIRATION']) ? $_ENV['LOGIN_EXPIRATION'] : 24 * 3600;
@@ -20,4 +20,6 @@ $cfg['Export']['file_template_database'] = ( isset($_ENV['STACK_NAME']) ? str_re
 $cfg['Export']['file_template_server'] = ( isset($_ENV['STACK_NAME']) ? str_replace('.','-',$_ENV['STACK_NAME']) : 'dev' ) . ( isset($_ENV['APPLICATION_ENV']) ? '-'.$_ENV['APPLICATION_ENV'] : '' ) . '--server--@SERVER@--%F--%H-%M-%S';
 $cfg['Export']['sql_drop_table'] = true;
 
-file_exists('config.servers.inc.php') && include_once('config.servers.inc.php');
+if (file_exists('/etc/phpmyadmin/servers/config.servers.inc.php')) {
+    include('/etc/phpmyadmin/servers/config.servers.inc.php');
+}

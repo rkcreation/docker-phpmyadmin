@@ -9,20 +9,20 @@ services:
   phpmyadmin:
     image: rkcreation/phpmyadmin:3
     restart: always
+    volumes:
+      - pmaconf:/etc/phpmyadmin/servers
+      - pmathemes:/var/www/html/themes
     ports:
       - 8500:80
-  gen:
-    image: jwilder/docker-gen
-    environment:
-      - PHPMYADMIN_SERVER=mysql_server2
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - pmaconf:/etc/phpmyadmin
-      - pmathemes:/www/themes
-      - ./phpmyadmin-servers.tmpl:/etc/docker-gen/templates/phpmyadmin-servers.tmpl
-    command: -notify-sighup phpmyadmin -watch /etc/docker-gen/templates/phpmyadmin-servers.tmpl /etc/phpmyadmin/config.servers.inc.php
-    volumes:
-      - ./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl
     networks:
       phpmyadmin:
       default:
+  gen:
+    image: jwilder/docker-gen
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - pmaconf:/etc/phpmyadmin/servers
+      - ./phpmyadmin-servers.tmpl:/etc/docker-gen/templates/phpmyadmin-servers.tmpl
+    command: -notify-sighup phpmyadmin -watch /etc/docker-gen/templates/phpmyadmin-servers.tmpl /etc/phpmyadmin/servers/config.servers.inc.php
+    networks:
+      phpmyadmin:

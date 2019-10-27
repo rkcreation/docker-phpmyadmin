@@ -1,5 +1,7 @@
-#!/bin/sh
-if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ] || [ "$1" == supervisord ] ; then
+#!/bin/bash
+
+if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
+
     if [ "$(id -u)" = '0' ]; then
         case "$1" in
             apache2*)
@@ -20,11 +22,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ] || [ "$1" == supervisord ] ; th
 
     if ! [ -e index.php -a -e db_designer.php ]; then
         echo >&2 "phpMyAdmin not found in $PWD - copying now..."
+        echo >&2 "$(ls -l $PWD)"
         if [ "$(ls -A)" ]; then
             echo >&2 "WARNING: $PWD is not empty - press Ctrl+C now if this is an error!"
             ( set -x; ls -A; sleep 10 )
         fi
-        ls -l /usr/src/phpmyadmin
         tar --create \
             --file - \
             --one-file-system \
@@ -48,15 +50,24 @@ EOT
     fi
 
     echo >&2 "Checking theme ${CUSTOM_THEME:-fallen} ..."
-    if [ ! -d "$( pwd )/themes/${CUSTOM_THEME:-fallen}" ]; then
+    if [ ! -d "$PWD/themes/${CUSTOM_THEME:-fallen}" ]; then
         echo >&2 "Downloading theme ${CUSTOM_THEME:-fallen} version ${CUSTOM_THEME_VERSION:-0.7} ..."
         curl --output theme.zip --location "https://files.phpmyadmin.net/themes/${CUSTOM_THEME:-fallen}/${CUSTOM_THEME_VERSION:-0.7}/${CUSTOM_THEME:-fallen}-${CUSTOM_THEME_VERSION:-0.7}.zip"
         echo >&2 "Unzipping theme ${CUSTOM_THEME:-fallen} ..."
-        rm -rf "$( pwd )/themes/${CUSTOM_THEME:-fallen}*"
-        unzip theme.zip -d "$( pwd )/themes"
+        rm -rf "$PWD/themes/${CUSTOM_THEME:-fallen}*"
+        unzip theme.zip -d "$PWD/themes"
         rm theme.zip
-        chown -R $user:$group "$( pwd )/themes/${CUSTOM_THEME:-fallen}"
+        chown -R $user:$group "$PWD/themes/${CUSTOM_THEME:-fallen}"
     fi
+
+    mkdir -p /etc/phpmyadmin/servers
+    if [ ! -f /etc/phpmyadmin/servers/config.servers.inc.php ]; then
+        touch /etc/phpmyadmin/servers/config.servers.inc.php
+    fi
+    chown "$user:$group" /etc/phpmyadmin/servers/config.servers.inc.php
+    chmod +x /etc/phpmyadmin/servers/config.servers.inc.php
+    chmod +w /etc/phpmyadmin/servers/config.servers.inc.php
+
 fi
 
 exec "$@"
