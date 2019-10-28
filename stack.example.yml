@@ -1,0 +1,54 @@
+version: '3.3'
+services:
+  gen:
+    image: jwilder/docker-gen:latest
+    command: -notify-sighup phpmyadmin -watch /etc/docker-gen/templates/phpmyadmin-servers.tmpl
+      /etc/phpmyadmin/servers/config.servers.inc.php
+    volumes:
+     - /var/run/docker.sock:/tmp/docker.sock:ro
+     - pmaconf:/etc/phpmyadmin/servers
+    networks:
+     - phpmyadmin
+    configs:
+     -
+      source: phpmyadmin-tmpl-servers
+      target: /etc/docker-gen/templates/phpmyadmin-servers.tmpl
+    logging:
+      driver: json-file
+    deploy:
+      labels:
+        swarmpit.service.deployment.autoredeploy: 'true'
+      placement:
+        constraints:
+         - node.labels.phpmyadmin.ui == true
+  phpmyadmin:
+    image: rkcreation/phpmyadmin:3
+    ports:
+     - 8500:80
+    volumes:
+     - pmaconf:/etc/phpmyadmin/servers
+     - pmathemes:/var/www/html/themes
+    networks:
+     - phpmyadmin
+     - default
+    logging:
+      driver: json-file
+    deploy:
+      labels:
+        phpmyadmin.ui: 'true'
+        swarmpit.service.deployment.autoredeploy: 'true'
+      placement:
+        constraints:
+         - node.labels.hosting.role == web
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+networks:
+  default:
+    driver: overlay
+  phpmyadmin:
+    external: true
+configs:
+  phpmyadmin-tmpl-servers:
+    external: true

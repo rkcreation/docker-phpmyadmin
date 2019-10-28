@@ -7,7 +7,7 @@ $cfg['SaveDir'] = '';
 
 /* Theme Metro */
 $cfg['ThemeManager'] = false;
-$cfg['ThemeDefault'] = 'pmahomme';//isset($_ENV['CUSTOM_THEME']) ? $_ENV['CUSTOM_THEME'] : 'fallen';
+$cfg['ThemeDefault'] = isset($_ENV['CUSTOM_THEME']) ? $_ENV['CUSTOM_THEME'] : 'fallen';
 
 /* Login validity */
 $cfg['LoginCookieValidity'] = isset($_ENV['LOGIN_EXPIRATION']) ? $_ENV['LOGIN_EXPIRATION'] : 24 * 3600;
